@@ -1,10 +1,11 @@
 # Railway — Servicio Backend (Germina API)
-# Nixpacks detecta Node.js automáticamente; este archivo hace
-# explícitos los comandos y las variables esperadas.
 
 [build]
 builder = "NIXPACKS"
 buildCommand = "npm install --omit=dev"
+
+[build.nixpacksPlan.variables]
+NIXPACKS_NODE_VERSION = "22"
 
 [deploy]
 startCommand = "node src/index.js"
@@ -12,6 +13,7 @@ healthcheckPath = "/api/health"
 healthcheckTimeout = 60
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 5
+
 
 # Variables de entorno que DEBEN estar configuradas en Railway:
 #

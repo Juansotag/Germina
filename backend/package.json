@@ -4,6 +4,9 @@
   "description": "Backend de Germina — API REST + integración LLM",
   "main": "src/index.js",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
