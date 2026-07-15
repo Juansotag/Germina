@@ -1,8 +1,12 @@
 import { supabase } from './supabase.js'
 
-// En Railway: VITE_API_URL = https://backend-production-XXX.up.railway.app/api
-// En desarrollo: el proxy de Vite reescribe /api → localhost:3001/api
-const API_BASE = import.meta.env.VITE_API_URL || '/api'
+// VITE_API_URL debe ser solo la URL, sin comillas ni el nombre de la variable.
+// Si llega mal configurada, usamos la URL de producción directamente.
+const _raw = import.meta.env.VITE_API_URL?.trim() ?? ''
+const API_BASE = _raw.startsWith('http')
+  ? _raw.replace(/\/$/, '')           // quitar barra final si la trae
+  : 'https://backend-production-166b4.up.railway.app/api'
+
 
 /**
  * Hace un fetch autenticado al backend usando el JWT de Supabase.
