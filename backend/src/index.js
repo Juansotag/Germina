@@ -16,12 +16,12 @@ const PORT = process.env.PORT || 3001
 const ALLOWED_ORIGINS = [
   'http://localhost:5173',
   'http://localhost:4173',
+  'https://germina.up.railway.app',           // dominio Railway producción
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
 ]
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Permitir requests sin origen (curl, Postman, mobile apps)
     if (!origin) return callback(null, true)
     if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true)
     callback(new Error(`CORS: origen no permitido — ${origin}`))
