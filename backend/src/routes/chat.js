@@ -159,7 +159,7 @@ const TOOLS = [
           },
           contenido: {
             type: 'string',
-            description: 'Contenido completo del documento en Markdown. Reglas ESTRICTAS: usa ## para secciones, ### para subsecciones, - para listas, **texto** para negritas (siempre con doble asterisco de apertura Y cierre, nunca dejes asteriscos sueltos). PROHIBIDO: guiones largos (— o --), asteriscos sin cerrar (***), flechas (->). Usa solo guion simple (-) como separador.'
+            description: 'Contenido completo del documento en Markdown. Reglas ESTRICTAS: usa ## para secciones, ### para subsecciones, - para listas, **texto** para negritas (siempre con doble asterisco de apertura Y cierre, nunca dejes asteriscos sueltos). PROHIBIDO: guiones largos (— o --), asteriscos sin cerrar (***), flechas (->). Para tablas usa el formato estandar markdown y esta ESTRICTAMENTE PROHIBIDO poner asteriscos (*) al inicio de las celdas de las tablas. Usa solo guion simple (-) como separador.'
           }
         },
         required: ['tipo', 'titulo', 'contenido']

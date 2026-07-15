@@ -317,7 +317,7 @@ function buildTable(rows) {
       children: [new Paragraph({
         children: [new TextRun({
           text: cell, bold: true, italics: true,
-          size: S.table, color: C.white, font: F.body,
+          size: S.table, color: C.white, font: F.heading,
         })],
         spacing: { before: 80, after: 80 },
         alignment: AlignmentType.LEFT,
