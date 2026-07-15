@@ -1,0 +1,73 @@
+{
+  "-1": {
+    "nombre": "Caracterización",
+    "descripcion": "Fase de caracterización del usuario. El asistente conoce quién es el usuario (rol, formación, experiencia) para calibrar el acompañamiento en todas las etapas siguientes.",
+    "herramientas": ["Cuestionario conversacional", "Preguntas de auto-reporte"],
+    "entregables_esperados": ["Perfil de usuario (rol, formación, experiencia)", "Nivel de acompañamiento calibrado"],
+    "rol_ia": "Conduce una conversación corta para identificar el rol del usuario y su familiaridad con metodologías de innovación. Ajusta el lenguaje automáticamente sin exponer jerga innecesaria."
+  },
+  "0": {
+    "nombre": "Creación del proyecto",
+    "descripcion": "El usuario registra su proyecto (nombre, objetivo, avances) y el asistente determina su nivel de maduración para decidir en qué etapa entra al proceso.",
+    "herramientas": ["Formulario conversacional de registro", "Escala de maduración (idea, prototipo, ventas, negocio_en_marcha)"],
+    "entregables_esperados": ["Ficha de proyecto (nombre, objetivo, avances)", "Nivel de maduración asignado", "Etapa de entrada al proceso"],
+    "rol_ia": "Registra el proyecto y, mediante preguntas dirigidas, determina objetivamente su nivel de maduración. Si detecta ventas o negocio en marcha, ubica el proyecto en la etapa 6 directamente."
+  },
+  "1": {
+    "nombre": "Exploración y Descubrimiento",
+    "descripcion": "Identificar oportunidades reales observando el entorno: usuarios, mercado, tecnología y tendencias. El objetivo es descubrir necesidades insatisfechas o problemas que vale la pena resolver antes de diseñar cualquier solución.",
+    "herramientas": ["Entrevistas en profundidad", "Observación etnográfica", "Análisis PESTEL", "Mapa de tendencias", "Benchmarking competitivo", "Mapa de stakeholders"],
+    "entregables_esperados": ["Mapa de usuarios y necesidades", "Insights clave del mercado", "Perfil del usuario objetivo", "Análisis de competencia y tendencias"],
+    "rol_ia": "Guía al usuario para salir al campo a observar y entrevistar. Proporciona plantillas de entrevista, explica técnicas de investigación cualitativa en lenguaje simple y ayuda a organizar y sintetizar los hallazgos. No avanza a la siguiente etapa sin evidencia real de campo."
+  },
+  "2": {
+    "nombre": "Definición del Desafío",
+    "descripcion": "Convertir los hallazgos de la exploración en un desafío de diseño claro y accionable. Un buen enunciado de desafío señala el problema correcto sin prescribir la solución.",
+    "herramientas": ["Mapa de empatía", "Mapa de viaje del usuario", "Diagrama de afinidad", "Enunciado 'How might we...'", "Persona de usuario"],
+    "entregables_esperados": ["Perfil de persona representativa", "Mapa de empatía", "Enunciado del desafío de diseño ('How might we...')"],
+    "rol_ia": "Ayuda al usuario a sintetizar la información recopilada, identificar patrones y formular un enunciado de desafío sólido. Revisa que el enunciado sea específico, humano-centrado y no contenga una solución implícita."
+  },
+  "3": {
+    "nombre": "Ideación",
+    "descripcion": "Generar la mayor cantidad posible de ideas para responder al desafío definido. La cantidad importa más que la calidad en esta etapa; el filtrado viene después.",
+    "herramientas": ["Lluvia de ideas (brainstorming)", "SCAMPER", "Pensamiento lateral", "Analogías y metáforas", "Técnica 6-3-5", "Moodboard de inspiración"],
+    "entregables_esperados": ["Banco de ideas (mínimo 20)", "Top 3-5 ideas priorizadas", "Criterios de selección de ideas"],
+    "rol_ia": "Facilita sesiones de ideación virtual, propone técnicas creativas adaptadas al contexto y ayuda a priorizar las ideas más prometedoras usando criterios de impacto y viabilidad."
+  },
+  "4": {
+    "nombre": "Prototipado",
+    "descripcion": "Convertir las mejores ideas en representaciones tangibles que puedan ser probadas con usuarios reales. Un prototipo no tiene que ser perfecto — tiene que ser suficientemente bueno para generar aprendizaje.",
+    "herramientas": ["Prototipo en papel", "Wireframes digitales", "Maqueta física", "Storyboard", "Role-playing / teatro de servicio", "Prototipo de Mago de Oz"],
+    "entregables_esperados": ["Prototipo de baja o media fidelidad", "Plan de prueba de usuario", "Hipótesis a validar"],
+    "rol_ia": "Guía al usuario para elegir el tipo de prototipo adecuado a su idea y recursos. Proporciona plantillas para documentar el prototipo y el plan de prueba. Desde esta etapa empieza a perfilar la ruta probable del proyecto."
+  },
+  "5": {
+    "nombre": "Validación",
+    "descripcion": "Probar el prototipo con usuarios reales para aprender qué funciona y qué no. La venta piloto es la forma más contundente de validación: si alguien paga por ello, la hipótesis central está validada.",
+    "herramientas": ["Prueba de usabilidad", "Test A/B", "Venta piloto", "Encuesta post-prueba", "Matriz de hallazgos", "Métricas de validación"],
+    "entregables_esperados": ["Resultados de pruebas con usuarios", "Aprendizajes documentados", "Decisión: pivotar, iterar o avanzar", "Evidencia de validación (idealmente ventas piloto)"],
+    "rol_ia": "Ayuda a diseñar las pruebas, analizar los resultados y tomar la decisión de pivotar, iterar o avanzar. Si hay evidencia de ventas, lo registra como señal de validación especialmente fuerte. Al cierre, facilita las tres preguntas de bifurcación para determinar la ruta."
+  },
+  "6": {
+    "nombre": "Estructuración por ruta",
+    "descripcion": "Estructuración específica según la ruta elegida: Business Model Canvas (emprendimiento), caso de negocio interno (intraemprendimiento), o ficha de activo de conocimiento para OTRI (transferencia).",
+    "herramientas": {
+      "emprendimiento": ["Business Model Canvas", "Propuesta de valor", "Análisis financiero básico", "Plan de go-to-market"],
+      "intraemprendimiento": ["Caso de negocio interno", "Análisis costo-beneficio", "Plan de gestión del cambio", "Mapa de stakeholders internos"],
+      "transferencia": ["Ficha de identificación de activo de conocimiento", "Checklist de elegibilidad para transferencia", "Contacto con OTRI"]
+    },
+    "entregables_esperados": {
+      "emprendimiento": ["Business Model Canvas completo", "Propuesta de valor afinada", "Plan de lanzamiento inicial"],
+      "intraemprendimiento": ["Caso de negocio listo para presentar", "Plan de implementación interna"],
+      "transferencia": ["Ficha de activo de conocimiento lista para OTRI", "Contacto inicial con equipo de transferencia"]
+    },
+    "rol_ia": "Adapta completamente su rol a la ruta. En emprendimiento: guía el BMC y la propuesta de valor. En intraemprendimiento: construye el caso de negocio interno. En transferencia: traduce la evidencia al formato que necesita OTRI y facilita la conexión."
+  },
+  "7": {
+    "nombre": "Modelo de implementación",
+    "descripcion": "Escalamiento y puesta en marcha. Para emprendimiento e intraemprendimiento: plan de implementación, OKRs y gestión del cambio. Para transferencia: acompañamiento ligero mientras OTRI ejecuta su ciclo de 8 pasos.",
+    "herramientas": ["Plan de lanzamiento por fases", "OKRs de innovación", "Modelo financiero detallado", "Roadmap tecnológico", "Estrategia de comunicación"],
+    "entregables_esperados": ["Plan de implementación", "Modelo financiero", "Dashboard de seguimiento (KPIs)", "Estrategia de comunicación a stakeholders"],
+    "rol_ia": "Construye el plan de implementación por fases, define OKRs y KPIs adaptados al contexto, genera la narrativa de cambio para distintos públicos y facilita la comunicación a stakeholders."
+  }
+}

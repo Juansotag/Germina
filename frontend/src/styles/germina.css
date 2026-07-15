@@ -1,0 +1,857 @@
+/* =====================================================================
+   GERMINA — Extensión del sistema de diseño GovLab
+   Solo lo específico de Germina; el base está en style.css
+   ===================================================================== */
+
+/* ─── Animación de carga (sustituye Tailwind's animate-spin) ─── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-spin {
+  animation: spin 0.8s linear infinite;
+  display: inline-flex;
+}
+
+/* ─── Fix: el CSS base solo tiene width:100% en input[type=text].
+       Email, password, date y number necesitan el mismo tratamiento. ─── */
+input[type="email"],
+input[type="password"],
+input[type="date"],
+input[type="number"] {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-main);
+  font-size: var(--fs-base);
+  color: var(--text-primary);
+  background: var(--bg-card);
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+  box-sizing: border-box;
+}
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="date"]:focus,
+input[type="number"]:focus {
+  border-color: var(--c-blue-light);
+  box-shadow: 0 0 0 3px rgba(0, 56, 125, 0.15);
+
+}
+
+/* También forzar en el input-wrapper para que no haya desborde */
+.input-wrapper {
+  width: 100%;
+}
+.input-wrapper input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;   /* necesario para que flex hijos respeten el limite del padre */
+  overflow: hidden;
+}
+
+/* ─── Sidebar ─── */
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: #fff;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+  gap: 1rem;
+  overflow-y: auto;
+}
+
+.sidebar-profile {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.65rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  min-width: 0;
+  width: 100%;
+}
+
+.sidebar-avatar {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  background: var(--c-blue-tint);
+  border: 2px solid var(--c-blue-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: var(--c-blue-dark);
+  font-weight: 700;
+  font-family: var(--font-display);
+  overflow: hidden;
+}
+
+.sidebar-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sidebar-name {
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+  max-width: 100%;
+}
+
+.sidebar-role {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+  max-width: 100%;
+}
+
+.sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* ─── Área de trabajo ─── */
+.workspace {
+  flex: 1;
+  min-height: 0;       /* evita que flex expanda el hijo más allá del padre */
+  overflow-y: auto;
+  padding: 2rem;
+  background: var(--bg-main);
+}
+
+/* ─── Header específico de Germina (full-width) ─── */
+.germina-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--c-blue-dark);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.germina-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 1.5rem;
+}
+
+.germina-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.germina-logo {
+  height: 34px;
+  width: auto;
+  object-fit: contain;
+}
+
+.header-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.25);
+  margin: 0 0.125rem;
+}
+
+.govlab-logo {
+  height: 30px;
+  width: auto;
+  object-fit: contain;
+}
+
+.germina-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-signout-btn {
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  border-radius: 50px;
+  padding: 0.35rem 1rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+  font-family: var(--font-main);
+  white-space: nowrap;
+}
+.header-signout-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+/* ─── Colores semánticos de ruta (íconos de proyecto) ─── */
+:root {
+  /* Rutas de proyecto — distintos del chrome institucional */
+  --route-trunk:              #F59E0B;   /* Tronco (etapas 1-5) — amarillo */
+  --route-trunk-bg:           #FFFBEB;
+  --route-trunk-border:       #FDE68A;
+
+  --route-emprendimiento:     #16A34A;   /* Verde — emprendimiento */
+  --route-emprendimiento-bg:  #F0FDF4;
+  --route-emprendimiento-border: #BBF7D0;
+
+  --route-transferencia:      #0EA5E9;   /* Azul cielo — transferencia (distinto del navy) */
+  --route-transferencia-bg:   #F0F9FF;
+  --route-transferencia-border:#BAE6FD;
+
+  --route-intraemprendimiento:#9333EA;   /* Morado — intraemprendimiento */
+  --route-intraemprendimiento-bg: #FAF5FF;
+  --route-intraemprendimiento-border: #E9D5FF;
+}
+
+/* ─── Ícono de proyecto (tarjeta en el grid) ─── */
+.project-card {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1.25rem 1rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+  text-align: center;
+  animation: fadeSlideIn 0.3s ease forwards;
+}
+.project-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-3px);
+  border-color: var(--c-blue-tint);
+}
+
+.project-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+  transition: transform var(--transition);
+}
+.project-card:hover .project-icon { transform: scale(1.06); }
+
+/* Colores por ruta */
+.project-icon.route-trunk {
+  background: var(--route-trunk-bg);
+  color: var(--route-trunk);
+  border: 2px solid var(--route-trunk-border);
+}
+.project-icon.route-emprendimiento {
+  background: var(--route-emprendimiento-bg);
+  color: var(--route-emprendimiento);
+  border: 2px solid var(--route-emprendimiento-border);
+}
+.project-icon.route-transferencia {
+  background: var(--route-transferencia-bg);
+  color: var(--route-transferencia);
+  border: 2px solid var(--route-transferencia-border);
+}
+.project-icon.route-intraemprendimiento {
+  background: var(--route-intraemprendimiento-bg);
+  color: var(--route-intraemprendimiento);
+  border: 2px solid var(--route-intraemprendimiento-border);
+}
+
+.project-name {
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  color: var(--text-primary);
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.project-stage-label {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ─── Grid de proyectos ─── */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+/* ─── Mensaje vacío ─── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  opacity: 0.4;
+}
+
+.empty-state h3 {
+  font-size: var(--fs-lg);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.empty-state p {
+  font-size: var(--fs-md);
+  max-width: 320px;
+  line-height: 1.6;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .app-body {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-width: unset;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    flex-direction: row;
+    align-items: center;
+    padding: 0.75rem 1rem;
+  }
+
+  .sidebar-profile {
+    flex-direction: row;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .workspace {
+    padding: 1rem;
+  }
+
+  .projects-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  }
+}
+
+/* =====================================================================
+   GERMINA — Estilos de Caracterización Avanzada & CV Upload
+   ===================================================================== */
+
+/* ─── CV Dropzone ─── */
+.cv-dropzone {
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  text-align: center;
+  background: var(--bg-main);
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+}
+.cv-dropzone:hover,
+.cv-dropzone.active {
+  border-color: var(--c-blue-light);
+  background: var(--route-transferencia-bg);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.08);
+}
+.cv-dropzone-text {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+.cv-dropzone-subtext {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+/* ─── Contenedor de Tags (Habilidades) ─── */
+.tags-input-container {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+.tag-badge {
+  background: var(--route-transferencia-bg);
+  border: 1px solid var(--route-transferencia-border);
+  color: var(--c-blue-dark);
+  border-radius: 50px;
+  padding: 0.25rem 0.75rem;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  animation: fadeSlideIn 0.2s ease;
+}
+.tag-badge button {
+  background: none;
+  border: none;
+  color: var(--c-blue-light);
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8rem;
+}
+.tag-badge button:hover {
+  color: var(--c-red);
+}
+
+/* ─── Lista de Experiencia Laboral ─── */
+.experience-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+.experience-card {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  animation: fadeSlideIn 0.25s ease;
+}
+.experience-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.experience-org {
+  font-weight: 700;
+  color: var(--c-blue-dark);
+  font-size: var(--fs-md);
+}
+.experience-title {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+}
+.experience-date {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.experience-desc {
+  font-size: var(--fs-sm);
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin-top: 0.25rem;
+}
+.btn-delete-card {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.2rem;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.btn-delete-card:hover {
+  background: #FEE2E2;
+  color: var(--c-red);
+}
+
+/* Form Row de Dos Columnas */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+@media (max-width: 580px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.experience-form-box {
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PASO 8 & 9 — Grid de proyectos y menú contextual
+   ══════════════════════════════════════════════════════════════ */
+
+/* Wrapper del área de trabajo del dashboard */
+.projects-workspace {
+  padding: 2rem;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.projects-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.projects-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--c-blue-dark);
+  margin: 0;
+  font-family: var(--font-display);
+}
+
+.projects-subtitle {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  margin: 0.15rem 0 0;
+}
+
+/* Grid */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1.25rem;
+}
+
+/* Tarjeta de proyecto */
+.project-card {
+  all: unset;
+  cursor: pointer;
+  background: #fff;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border-color);
+  padding: 1.25rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.project-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-3px);
+  border-color: var(--ruta-border, var(--c-blue-soft));
+}
+
+.project-card:active {
+  transform: translateY(0);
+}
+
+/* Ícono circular del proyecto */
+.project-card-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.project-card:hover .project-card-icon {
+  transform: scale(1.06);
+}
+
+/* Chip de ruta */
+.project-ruta-chip {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.project-card-name {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.project-card-stage {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.project-stage-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.project-card-time {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Tarjeta "añadir proyecto" */
+.project-card--add {
+  border: 2px dashed var(--border-color);
+  background: transparent;
+  min-height: 180px;
+  justify-content: center;
+  color: var(--text-muted);
+  gap: 0.4rem;
+}
+
+.project-card--add:hover {
+  border-color: var(--c-blue-soft);
+  background: var(--c-blue-tint);
+  box-shadow: none;
+  transform: none;
+}
+
+/* ─── Menú contextual flotante (Paso 9) ─── */
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.92) translateY(-4px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+.project-menu-item {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  transition: background 0.12s, color 0.12s;
+  box-sizing: border-box;
+  font-family: var(--font-main);
+}
+
+.project-menu-item:hover {
+  background: var(--bg-main);
+  color: var(--text-primary);
+}
+
+.project-menu-item.danger {
+  color: var(--c-red);
+}
+
+.project-menu-item.danger:hover {
+  background: #FEE2E2;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PASO 11 & 12 — Vista de proyecto / Chat
+   ══════════════════════════════════════════════════════════════ */
+
+/* Header del chat */
+.chat-header {
+  padding: 1rem 1.5rem;
+  background: #fff;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+/* Área de mensajes — scrollable */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-main);
+}
+
+/* Zona de input fija al fondo */
+.chat-input-area {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  padding: 1rem 1.5rem;
+  background: #fff;
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+/* Textarea del chat */
+.chat-input {
+  flex: 1;
+  resize: none;
+  padding: 0.65rem 0.9rem;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-main);
+  font-size: var(--fs-base);
+  color: var(--text-primary);
+  background: #fff;
+  transition: border-color 0.15s;
+  line-height: 1.5;
+  min-height: 52px;
+  max-height: 140px;
+}
+
+.chat-input:focus {
+  outline: none;
+  border-color: var(--c-blue-light);
+}
+
+.chat-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Animaciones ── */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50%       { transform: translateY(-4px); opacity: 1; }
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-spin { animation: spin 1s linear infinite; }
+
+.markdown-body {
+  font-size: inherit;
+  color: inherit;
+  line-height: 1.65;
+}
+.markdown-body > *:first-child { margin-top: 0; }
+.markdown-body > *:last-child  { margin-bottom: 0; }
+
+.markdown-body p  { margin: 0 0 0.6em; }
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3 { font-weight: 700; margin: 0.8em 0 0.3em; color: var(--c-blue-dark); }
+.markdown-body h1 { font-size: 1.1em; }
+.markdown-body h2 { font-size: 1em; }
+.markdown-body h3 { font-size: 0.95em; }
+
+.markdown-body ul,
+.markdown-body ol  { margin: 0.4em 0 0.6em 1.25em; padding: 0; }
+.markdown-body li  { margin-bottom: 0.2em; }
+
+.markdown-body strong { font-weight: 700; }
+.markdown-body em     { font-style: italic; }
+
+.markdown-body code {
+  background: rgba(0,19,91,0.07);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  font-size: 0.88em;
+  font-family: 'Courier New', monospace;
+}
+
+.markdown-body pre {
+  background: rgba(0,19,91,0.06);
+  border-radius: var(--radius-sm);
+  padding: 0.75em 1em;
+  overflow-x: auto;
+  margin: 0.5em 0;
+}
+.markdown-body pre code { background: none; padding: 0; font-size: 0.85em; }
+
+.markdown-body table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.85em;
+  margin: 0.5em 0;
+}
+.markdown-body th,
+.markdown-body td {
+  border: 1px solid var(--border-color);
+  padding: 0.35em 0.6em;
+  text-align: left;
+}
+.markdown-body th { background: var(--bg-main); font-weight: 700; }
+
+.markdown-body hr {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 0.75em 0;
+}
+
+.markdown-body blockquote {
+  border-left: 3px solid var(--c-blue-soft);
+  padding-left: 0.75em;
+  margin: 0.5em 0;
+  color: var(--text-secondary);
+  font-style: italic;
+}

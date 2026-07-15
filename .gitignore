@@ -1,0 +1,27 @@
+# ── Dependencias ────────────────────────────────────────────────
+node_modules/
+
+# ── Variables de entorno ─────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── Build outputs ────────────────────────────────────────────────
+dist/
+build/
+
+# ── Dev artifacts y herramientas internas ────────────────────────
+*.docx
+uploads/
+*.log
+docx-skill/
+docx-govlab/
+docx/
+backend/src/scripts/
+
+# ── OS / Editor ──────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+~$*
+.vscode/
+.idea/

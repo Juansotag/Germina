@@ -1,0 +1,25 @@
+# Railway — Servicio Backend (Germina API)
+# Nixpacks detecta Node.js automáticamente; este archivo hace
+# explícitos los comandos y las variables esperadas.
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "npm install --omit=dev"
+
+[deploy]
+startCommand = "node src/index.js"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 60
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5
+
+# Variables de entorno que DEBEN estar configuradas en Railway:
+#
+#   DATABASE_URL               → Connection string de Supabase Postgres
+#   SUPABASE_URL               → https://uifeiyyzhuhfbvysqdgr.supabase.co
+#   SUPABASE_SERVICE_ROLE_KEY  → eyJ... (service role, solo backend)
+#   ANTHROPIC_API_KEY          → sk-ant-...
+#   OPENAI_API_KEY             → sk-proj-...
+#   JWT_SECRET                 → cadena aleatoria larga
+#   FRONTEND_URL               → https://<tu-frontend>.railway.app
+#   PORT                       → Railway lo inyecta automáticamente
