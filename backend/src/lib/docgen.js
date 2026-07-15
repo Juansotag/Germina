@@ -46,10 +46,9 @@ const C = {
   white:     'FFFFFF',
 }
 
-// ── Fuentes ─────────────────────────────────────────────────────────────────
 const F = {
   display: 'Publico Banner',   // títulos portada y H1/H2
-  heading: 'Libre Franklin',   // H3/H4 — siempre disponible
+  heading: 'Cabinet Grotesk',  // H3/H4 — subtítulos
   body:    'Libre Franklin',   // cuerpo, listas, tablas
   mono:    'Courier New',      // código inline
 }
@@ -264,9 +263,7 @@ function sanitize(text) {
     .replace(/\u2013/g, '-')          // – en dash → guion simple
     .replace(/\u2012/g, '-')          // figure dash → guion simple
     .replace(/---?/g, '-')            // triple/doble guion literal → guion simple
-    .replace(/\*{3,}/g, '')           // *** o **** sin cerrar → eliminado
     .replace(/\*\*\s*\*\*/g, '')      // **** (negrilla vacía) → eliminado
-    .replace(/(?<!\*)(\*{1,2})(?!\w)/g, '') // asterisco(s) sueltos al final → eliminado
 }
 
 // ── Parser de inline markdown ────────────────────────────────────────────────
@@ -385,7 +382,7 @@ function mdToDocx(md) {
       elems.push(new Paragraph({
         children: [new TextRun({
           text: t.slice(5), italics: true,
-          size: S.h4, color: C.blue, font: F.body,
+          size: S.h4, color: C.blue, font: F.heading,
         })],
         spacing: { before: 200, after: 60 },
       })); continue
@@ -396,8 +393,8 @@ function mdToDocx(md) {
       elems.push(new Paragraph({
         heading: HeadingLevel.HEADING_3,
         children: [new TextRun({
-          text: t.slice(4),
-          size: S.h3, color: C.blue, font: F.body,
+          text: t.slice(4), italics: true,
+          size: S.h3, color: C.blue, font: F.heading,
         })],
         spacing: { before: 300, after: 80 },
       })); continue
