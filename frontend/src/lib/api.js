@@ -1,5 +1,7 @@
 import { supabase } from './supabase.js'
 
+// En Railway: VITE_API_URL = https://backend-production-XXX.up.railway.app/api
+// En desarrollo: el proxy de Vite reescribe /api → localhost:3001/api
 const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
 /**
