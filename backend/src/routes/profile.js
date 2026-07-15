@@ -3,7 +3,8 @@ import multer from 'multer'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import Anthropic from '@anthropic-ai/sdk'
+import OpenAI from 'openai'
+import { extractText } from 'unpdf'
 import { requireAuth } from '../middleware/auth.js'
 import { query, getClient } from '../db/index.js'
 
@@ -20,15 +21,15 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }
 })
 
-// Inicializar Claude si la API key existe
-const anthropicKey = process.env.ANTHROPIC_API_KEY
-let claude = null
+// Inicializar OpenAI si la API key existe
+const openaiKey = process.env.OPENAI_API_KEY
+let openai = null
 
-if (anthropicKey) {
-  claude = new Anthropic({ apiKey: anthropicKey })
-  console.log('🤖  Claude (Anthropic) configurado correctamente en el backend.')
+if (openaiKey) {
+  openai = new OpenAI({ apiKey: openaiKey })
+  console.log('🤖  OpenAI configurado correctamente en el backend (profile).')
 } else {
-  console.warn('⚠️  ANTHROPIC_API_KEY no definida en .env. Se usará el modo simulado en local.')
+  console.warn('⚠️  OPENAI_API_KEY no definida en .env. Se usará el modo simulado en local.')
 }
 
 const CV_PROMPT = `Analiza el currículum adjunto y devuelve ÚNICAMENTE un objeto JSON (sin markdown, sin explicaciones) con esta estructura exacta:
@@ -93,39 +94,34 @@ router.post('/parse-cv', requireAuth, upload.single('cv'), async (req, res) => {
   try {
     let cvDataJson = null
 
-    if (claude) {
+    if (openai) {
       const fileBuffer = fs.readFileSync(filePath)
-      const base64Data = fileBuffer.toString('base64')
 
-      // Claude 3.5 Sonnet soporta PDFs nativamente mediante el bloque "document"
-      const message = await claude.messages.create({
-        model: 'claude-sonnet-4-5',
+      // Extraer el texto del PDF con unpdf (requiere Uint8Array, no Buffer)
+      let cvText = ''
+      if (mimeType === 'application/pdf') {
+        const uint8 = new Uint8Array(fileBuffer.buffer, fileBuffer.byteOffset, fileBuffer.byteLength)
+        const { text } = await extractText(uint8, { mergePages: true })
+        cvText = text
+      } else {
+        cvText = fileBuffer.toString('utf8')
+      }
+
+      const message = await openai.chat.completions.create({
+        model: 'gpt-4o',
         max_tokens: 2048,
         messages: [
           {
             role: 'user',
-            content: [
-              {
-                type: 'document',
-                source: {
-                  type: 'base64',
-                  media_type: mimeType === 'application/pdf' ? 'application/pdf' : 'text/plain',
-                  data: base64Data
-                }
-              },
-              {
-                type: 'text',
-                text: CV_PROMPT
-              }
-            ]
+            content: `${CV_PROMPT}\n\n---\nCONTENIDO DEL CV:\n${cvText}`
           }
         ]
       })
 
-      const rawText = message.content[0].text.trim()
-      // Extraer el JSON aunque Claude haya añadido algún delimitador de markdown
+      const rawText = message.choices[0].message.content?.trim() ?? ''
+      // Extraer el JSON aunque GPT haya añadido algún delimitador de markdown
       const jsonMatch = rawText.match(/\{[\s\S]*\}/)
-      if (!jsonMatch) throw new Error('Claude no devolvió un JSON válido')
+      if (!jsonMatch) throw new Error('OpenAI no devolvió un JSON válido')
       cvDataJson = JSON.parse(jsonMatch[0])
 
     } else {
@@ -160,7 +156,7 @@ router.post('/parse-cv', requireAuth, upload.single('cv'), async (req, res) => {
 
     res.json(cvDataJson)
   } catch (err) {
-    console.error('Error al parsear el CV con Claude:', err.message)
+    console.error('Error al parsear el CV con OpenAI:', err.message)
     res.status(500).json({ error: 'No se pudo procesar el currículum: ' + err.message })
   } finally {
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath)

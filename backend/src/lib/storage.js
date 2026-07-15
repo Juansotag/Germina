@@ -26,9 +26,12 @@ export async function uploadDoc(buffer, path, contentType = 'application/vnd.ope
 
   if (error) throw new Error(`Storage upload error: ${error.message}`)
 
-  const { data: signed } = await supabaseAdmin.storage
+  // Signed URL válida por 1 año — funciona en buckets públicos y privados
+  const { data: signed, error: signErr } = await supabaseAdmin.storage
     .from(BUCKET_DOCS)
-    .createSignedUrl(path, 60 * 60 * 24 * 365) // 1 año
+    .createSignedUrl(data.path, 60 * 60 * 24 * 365)
+
+  if (signErr) throw new Error(`Storage sign error: ${signErr.message}`)
 
   return signed?.signedUrl ?? null
 }

@@ -3,9 +3,8 @@
  * Estándar docx-govlab: header azul oscuro con logos, footer azul con título,
  * portada limpia, parser de markdown completo (incluyendo tablas).
  *
- * Dimensiones reales de los logos:
- *   logo_azul.png / logo_blanco.png : 639 × 639 px (cuadrado)
- *   GovLab_blanco.png               : 3483 × 1242 px (ratio 2.80:1)
+ * Paleta: único azul institucional #00135B (igual que la web)
+ * Fuentes: Publico Banner (display/títulos) · Libre Franklin (cuerpo)
  */
 import fs from 'fs'
 import path from 'path'
@@ -21,16 +20,38 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.join(__dirname, '../../../')
 
-// ── Paleta institucional ────────────────────────────────────────────────────
+// ── Paleta institucional completa (espeja los tokens CSS de la web) ──────────
 const C = {
-  blueDark:  '00135B',
-  blueLight: '00387D',
-  blueSoft:  '93AAC9',
-  blueTint:  'D9E1EF',
-  yellow:    'F8A719',
+  // Azules
+  blueDark:  '00135B',   // --c-blue-dark   · navbar, botones primarios
+  blueHover: '000E42',   // --c-blue-hover  · hover de botones
+  blueLight: '00387D',   // --c-blue-light  · focus, interacciones
+  blueSoft:  '93AAC9',   // --c-blue-soft   · botones secundarios
+  blueTint:  'D9E1EF',   // --c-blue-tint   · bordes, hover backgrounds
+  // Acentos
+  cream:     'F7EFD9',   // --c-cream       · acento cálido
+  yellow:    'F8A719',   // --c-yellow      · acento dorado
+  red:       '96272D',   // --c-red         · rojo institucional
+  // Semánticos
+  bgMain:    'EEF2F8',   // --bg-main
+  bgCard:    'FFFFFF',   // --bg-card
+  textPrimary:   '00135B',  // --text-primary
+  textSecondary: '374151',  // --text-secondary
+  textMuted:     '64748B',  // --text-muted
+  border:        'D9E1EF',  // --border-color
+  // Aliases cortos usados internamente
+  blue:      '00135B',   // = blueDark (color principal del documento)
+  blueRow:   'EEF2F8',   // fondo alterno de filas de tabla
   textBody:  '374151',
-  textMuted: '64748B',
   white:     'FFFFFF',
+}
+
+// ── Fuentes ─────────────────────────────────────────────────────────────────
+const F = {
+  display: 'Publico Banner',   // títulos portada y H1/H2
+  heading: 'Libre Franklin',   // H3/H4 — siempre disponible
+  body:    'Libre Franklin',   // cuerpo, listas, tablas
+  mono:    'Courier New',      // código inline
 }
 
 // ── Tamaños (half-points) ───────────────────────────────────────────────────
@@ -39,9 +60,9 @@ const S = {
   h1:      52,   // 26pt
   h2:      40,   // 20pt
   h3:      32,   // 16pt
+  h4:      28,   // 14pt
   body:    22,   // 11pt
   small:   18,   // 9pt
-  footer:  16,   // 8pt
   table:   20,   // 10pt
 }
 
@@ -54,19 +75,16 @@ function loadLogo(name) {
   return null
 }
 
-const logoAzul    = loadLogo('logo_azul.png')
-const logoBlanco  = loadLogo('logo_blanco.png')
+const logoBlanco   = loadLogo('logo_blanco.png')
 const govlabBlanco = loadLogo('GovLab_blanco.png')
 
-// TTF de Publico Banner (convertido desde el woff2 institucional)
-// Se incrusta en el .docx para que Word lo renderice en cualquier maquina
+// TTF de Publico Banner — se incrusta en el .docx para que Word lo renderice
 const FONT_TTF_PATH = path.join(__dirname, '../assets/PublicoBanner.ttf')
 const publicoBannerTtf = fs.existsSync(FONT_TTF_PATH) ? fs.readFileSync(FONT_TTF_PATH) : null
-if (!publicoBannerTtf) console.warn('[docgen] No se encontro PublicoBanner.ttf — titulos usaran fuente de sistema')
+if (!publicoBannerTtf) console.warn('[docgen] PublicoBanner.ttf no encontrado — se usará Libre Franklin en su lugar')
 
-// Ratios reales
-// logo_azul / logo_blanco : 639x639 → ratio 1.0
-// GovLab_blanco           : 3483x1242 → ratio 2.804
+// Si no hay TTF disponible, usar Libre Franklin como fallback de display
+const FONT_DISPLAY = publicoBannerTtf ? F.display : F.body
 
 /** Escala un logo a altura objetivo (px) manteniendo ratio real */
 function imgRun(buffer, heightPx, ratioWH) {
@@ -77,8 +95,8 @@ function imgRun(buffer, heightPx, ratioWH) {
   })
 }
 
-// ── Helpers de párrafos ─────────────────────────────────────────────────────
-const noBorder = { style: BorderStyle.NONE }
+// ── Helpers ─────────────────────────────────────────────────────────────────
+const noBorder     = { style: BorderStyle.NONE }
 const noAllBorders = { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder }
 
 function spacer(before = 120, after = 120) {
@@ -97,16 +115,16 @@ function hr(color = C.blueTint, size = 4) {
 function buildHeader() {
   const leftPara = new Paragraph({
     children: logoBlanco
-      ? [imgRun(logoBlanco, 44, 1.0)]   // 44×44 px (cuadrado)
-      : [new TextRun({ text: 'Germina', bold: true, color: C.white, size: S.body, font: 'Calibri' })],
+      ? [imgRun(logoBlanco, 44, 1.0)]
+      : [new TextRun({ text: 'Germina', bold: true, color: C.white, size: S.body, font: F.body })],
     spacing: { before: 200, after: 200 },
     alignment: AlignmentType.LEFT,
   })
 
   const rightPara = new Paragraph({
     children: govlabBlanco
-      ? [imgRun(govlabBlanco, 38, 2.804)] // 38px alto → 106px ancho
-      : [new TextRun({ text: 'GovLab', bold: true, color: C.white, size: S.body, font: 'Calibri' })],
+      ? [imgRun(govlabBlanco, 38, 2.804)]
+      : [new TextRun({ text: 'GovLab', bold: true, color: C.white, size: S.body, font: F.body })],
     spacing: { before: 200, after: 200 },
     alignment: AlignmentType.RIGHT,
   })
@@ -122,13 +140,13 @@ function buildHeader() {
         rows: [new TableRow({
           children: [
             new TableCell({
-              shading: { type: ShadingType.CLEAR, fill: C.blueDark },
+              shading: { type: ShadingType.CLEAR, fill: C.blue },
               width: { size: 50, type: WidthType.PERCENTAGE },
               borders: noAllBorders,
               children: [leftPara],
             }),
             new TableCell({
-              shading: { type: ShadingType.CLEAR, fill: C.blueDark },
+              shading: { type: ShadingType.CLEAR, fill: C.blue },
               width: { size: 50, type: WidthType.PERCENTAGE },
               borders: noAllBorders,
               children: [rightPara],
@@ -146,14 +164,14 @@ function buildFooter(titulo) {
 
   const leftPara = new Paragraph({
     children: [
-      new TextRun({ text: label, color: C.blueSoft, size: S.small, font: 'Calibri' }),
+      new TextRun({ text: label, color: C.blueSoft, size: S.small, font: F.body }),
     ],
     spacing: { before: 220, after: 220 },
   })
 
   const rightPara = new Paragraph({
     children: [
-      new TextRun({ text: 'Pag. ', color: C.blueSoft, size: S.small, font: 'Calibri' }),
+      new TextRun({ text: 'Pág. ', color: C.blueSoft, size: S.small, font: F.body }),
       new TextRun({ children: [PageNumber.CURRENT], color: C.blueSoft, size: S.small }),
       new TextRun({ text: ' / ', color: C.blueSoft, size: S.small }),
       new TextRun({ children: [PageNumber.TOTAL_PAGES], color: C.blueSoft, size: S.small }),
@@ -173,13 +191,13 @@ function buildFooter(titulo) {
         rows: [new TableRow({
           children: [
             new TableCell({
-              shading: { type: ShadingType.CLEAR, fill: C.blueDark },
+              shading: { type: ShadingType.CLEAR, fill: C.blue },
               width: { size: 70, type: WidthType.PERCENTAGE },
               borders: noAllBorders,
               children: [leftPara],
             }),
             new TableCell({
-              shading: { type: ShadingType.CLEAR, fill: C.blueDark },
+              shading: { type: ShadingType.CLEAR, fill: C.blue },
               width: { size: 30, type: WidthType.PERCENTAGE },
               borders: noAllBorders,
               children: [rightPara],
@@ -195,24 +213,18 @@ function buildFooter(titulo) {
 function buildPortada({ titulo, proyectoNombre, etapaNombre, usuarioNombre, fecha }) {
   const elems = []
 
-  // Logo de la institución en portada (logo_azul, cuadrado, 60px)
-  if (logoAzul) {
-    elems.push(new Paragraph({
-      children: [imgRun(logoAzul, 56, 1.0)],
-      spacing: { before: convertInchesToTwip(0.8), after: 480 },
-    }))
-  } else {
-    elems.push(spacer(convertInchesToTwip(0.8), 480))
-  }
+  // Espacio superior
+  elems.push(spacer(convertInchesToTwip(0.8), 480))
 
-  // Título principal
+  // Título principal en Publico Banner (o fallback)
   elems.push(new Paragraph({
     children: [new TextRun({
       text: titulo,
       size: S.display,
-      color: C.blueDark,
-      font: 'Publico Banner',
+      color: C.blue,
+      font: FONT_DISPLAY,
       bold: false,
+      italics: true,
     })],
     spacing: { before: 0, after: 120 },
   }))
@@ -223,95 +235,120 @@ function buildPortada({ titulo, proyectoNombre, etapaNombre, usuarioNombre, fech
   // Metadatos
   const meta = [
     ['Proyecto', proyectoNombre],
-    etapaNombre ? ['Etapa', etapaNombre] : null,
-    usuarioNombre ? ['Elaborado por', usuarioNombre] : null,
+    etapaNombre   ? ['Etapa', etapaNombre]         : null,
+    usuarioNombre ? ['Elaborado por', usuarioNombre]: null,
     ['Fecha', fecha],
   ].filter(Boolean)
 
   for (const [label, value] of meta) {
     elems.push(new Paragraph({
       children: [
-        new TextRun({ text: `${label}: `, bold: true, size: S.body, color: C.textMuted, font: 'Calibri' }),
-        new TextRun({ text: value, size: S.body, color: C.textMuted, font: 'Calibri' }),
+        new TextRun({ text: `${label}: `, bold: true, size: S.body, color: C.textMuted, font: F.body }),
+        new TextRun({ text: value,         size: S.body, color: C.textMuted, font: F.body }),
       ],
       spacing: { before: 0, after: 60 },
     }))
   }
 
-  // Salto de página (debe ir dentro de Paragraph — gotcha docx-js)
+  // Salto de página
   elems.push(new Paragraph({ children: [new PageBreak()], spacing: { before: 0, after: 0 } }))
 
   return elems
 }
 
+// ── Sanitización de texto antes del parser ──────────────────────────────────
+// Limpia artefactos que GPT a veces genera: em-dashes, asteriscos huérfanos
+function sanitize(text) {
+  return text
+    .replace(/\u2014/g, '-')          // — em dash → guion simple
+    .replace(/\u2013/g, '-')          // – en dash → guion simple
+    .replace(/\u2012/g, '-')          // figure dash → guion simple
+    .replace(/---?/g, '-')            // triple/doble guion literal → guion simple
+    .replace(/\*{3,}/g, '')           // *** o **** sin cerrar → eliminado
+    .replace(/\*\*\s*\*\*/g, '')      // **** (negrilla vacía) → eliminado
+    .replace(/(?<!\*)(\*{1,2})(?!\w)/g, '') // asterisco(s) sueltos al final → eliminado
+}
+
 // ── Parser de inline markdown ────────────────────────────────────────────────
 function inlineRuns(text, color = C.textBody, size = S.body) {
+  const clean = sanitize(text)
   const runs = []
   const re = /\*\*([^*]+)\*\*|\*([^*]+)\*|`([^`]+)`/g
   let last = 0, m
-  while ((m = re.exec(text)) !== null) {
+  while ((m = re.exec(clean)) !== null) {
     if (m.index > last)
-      runs.push(new TextRun({ text: text.slice(last, m.index), size, color, font: 'Libre Franklin' }))
+      runs.push(new TextRun({ text: clean.slice(last, m.index), size, color, font: F.body }))
     if (m[1] != null)
-      runs.push(new TextRun({ text: m[1], bold: true, size, color, font: 'Libre Franklin' }))
+      runs.push(new TextRun({ text: m[1], bold: true,    size, color, font: F.body }))
     else if (m[2] != null)
-      runs.push(new TextRun({ text: m[2], italics: true, size, color, font: 'Libre Franklin' }))
+      runs.push(new TextRun({ text: m[2], italics: true, size, color, font: F.body }))
     else
-      runs.push(new TextRun({ text: m[3], size, color: C.blueLight, font: 'Courier New' }))
+      runs.push(new TextRun({ text: m[3], size, color: C.blue, font: F.mono }))
     last = m.index + m[0].length
   }
-  if (last < text.length)
-    runs.push(new TextRun({ text: text.slice(last), size, color, font: 'Libre Franklin' }))
-  return runs.length ? runs : [new TextRun({ text, size, color, font: 'Libre Franklin' })]
+  if (last < clean.length)
+    runs.push(new TextRun({ text: clean.slice(last), size, color, font: F.body }))
+  return runs.length ? runs : [new TextRun({ text: clean, size, color, font: F.body })]
 }
 
 // ── Parser de tablas markdown ────────────────────────────────────────────────
-function isTableRow(line) { return line.trim().startsWith('|') && line.trim().endsWith('|') }
-function isSeparatorRow(line) { return /^\s*\|[\s\-|:]+\|\s*$/.test(line) }
+function isTableRow(line)    { return line.trim().startsWith('|') && line.trim().endsWith('|') }
+function isSeparatorRow(line){ return /^\s*\|[\s\-|:]+\|\s*$/.test(line) }
 
 function parseCells(line) {
   return line.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim())
 }
 
 function buildTable(rows) {
-  // rows[0] = header, rows[1] = separator, rows[2..] = data
   const headerCells = parseCells(rows[0])
-  const dataRows = rows.slice(2).filter(r => !isSeparatorRow(r) && r.trim())
-  const colCount = headerCells.length
-  const colWidth = Math.floor(9072 / colCount)
+  const dataRows    = rows.slice(2).filter(r => !isSeparatorRow(r) && r.trim())
+  const colCount    = headerCells.length
+  const colWidth    = Math.floor(9072 / colCount)
+
+  const thinBorder  = { style: BorderStyle.SINGLE, size: 4,  color: C.blueTint }
+  const cellBorders = { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder }
 
   const tableRows = []
 
-  // Fila de encabezado
+  // ── Fila de encabezado ──────────────────────────────────────────────────
   tableRows.push(new TableRow({
     tableHeader: true,
     children: headerCells.map(cell => new TableCell({
-      shading: { type: ShadingType.CLEAR, fill: C.blueTint },
-      width: { size: colWidth, type: WidthType.DXA },
+      shading: { type: ShadingType.CLEAR, fill: C.blue },
+      width:   { size: colWidth, type: WidthType.DXA },
+      borders: cellBorders,
       children: [new Paragraph({
-        children: [new TextRun({ text: cell, bold: true, size: S.table, color: C.blueDark, font: 'Cabinet Grotesk' })],
-        spacing: { before: 60, after: 60 },
+        children: [new TextRun({
+          text: cell, bold: true, italics: true,
+          size: S.table, color: C.white, font: F.body,
+        })],
+        spacing: { before: 80, after: 80 },
+        alignment: AlignmentType.LEFT,
       })],
     })),
   }))
 
-  // Filas de datos
-  for (const row of dataRows) {
+  // ── Filas de datos (filas alternas) ─────────────────────────────────────
+  dataRows.forEach((row, rowIdx) => {
     const cells = parseCells(row)
+    const fill  = rowIdx % 2 === 0 ? C.white : C.blueRow
+
     tableRows.push(new TableRow({
-      children: cells.map((cell, i) => new TableCell({
-        width: { size: colWidth, type: WidthType.DXA },
+      children: cells.map(cell => new TableCell({
+        shading: { type: ShadingType.CLEAR, fill },
+        width:   { size: colWidth, type: WidthType.DXA },
+        borders: cellBorders,
         children: [new Paragraph({
           children: inlineRuns(cell, C.textBody, S.table),
-          spacing: { before: 50, after: 50 },
+          spacing: { before: 60, after: 60 },
         })],
       })),
     }))
-  }
+  })
 
   return new Table({
     width: { size: 9072, type: WidthType.DXA },
-    rows: tableRows,
+    rows:  tableRows,
   })
 }
 
@@ -323,7 +360,7 @@ function mdToDocx(md) {
 
   while (i < lines.length) {
     const raw = lines[i]
-    const t = raw.trim()
+    const t   = raw.trim()
     i++
 
     // Línea vacía
@@ -338,43 +375,55 @@ function mdToDocx(md) {
       }
       if (tableLines.length >= 2) {
         elems.push(buildTable(tableLines))
-        elems.push(spacer(120, 120))
+        elems.push(spacer(160, 160))
       }
       continue
     }
 
-    // Encabezados
-    if (t.startsWith('#### '))
-      return void elems.push(new Paragraph({
-        children: [new TextRun({ text: t.slice(5), bold: true, size: S.h3, color: C.blueLight, font: 'Cabinet Grotesk' })],
-        spacing: { before: 200, after: 80 },
-      })) || elems && undefined || (i = i)
-
+    // #### H4
     if (t.startsWith('#### ')) {
       elems.push(new Paragraph({
-        children: [new TextRun({ text: t.slice(5), bold: true, size: S.h3, color: C.blueLight, font: 'Cabinet Grotesk' })],
-        spacing: { before: 200, after: 80 },
+        children: [new TextRun({
+          text: t.slice(5), italics: true,
+          size: S.h4, color: C.blue, font: F.body,
+        })],
+        spacing: { before: 200, after: 60 },
       })); continue
     }
+
+    // ### H3
     if (t.startsWith('### ')) {
       elems.push(new Paragraph({
         heading: HeadingLevel.HEADING_3,
-        children: [new TextRun({ text: t.slice(4), bold: true, size: S.h3, color: C.blueLight, font: 'Cabinet Grotesk' })],
-        spacing: { before: 300, after: 100 },
+        children: [new TextRun({
+          text: t.slice(4),
+          size: S.h3, color: C.blue, font: F.body,
+        })],
+        spacing: { before: 300, after: 80 },
       })); continue
     }
+
+    // ## H2
     if (t.startsWith('## ')) {
       elems.push(new Paragraph({
         heading: HeadingLevel.HEADING_2,
-        children: [new TextRun({ text: t.slice(3), bold: true, size: S.h2, color: C.blueDark, font: 'Publico Banner' })],
+        children: [new TextRun({
+          text: t.slice(3),
+          size: S.h2, color: C.blue, font: FONT_DISPLAY,
+        })],
         border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: C.blueTint, space: 4 } },
         spacing: { before: 400, after: 80 },
       })); continue
     }
+
+    // # H1
     if (t.startsWith('# ')) {
       elems.push(new Paragraph({
         heading: HeadingLevel.HEADING_1,
-        children: [new TextRun({ text: t.slice(2), bold: true, size: S.h1, color: C.blueDark, font: 'Publico Banner' })],
+        children: [new TextRun({
+          text: t.slice(2),
+          size: S.h1, color: C.blue, font: FONT_DISPLAY,
+        })],
         spacing: { before: 480, after: 160 },
       })); continue
     }
@@ -382,10 +431,10 @@ function mdToDocx(md) {
     // Citas
     if (t.startsWith('> ')) {
       elems.push(new Paragraph({
-        children: inlineRuns(t.slice(2), C.blueLight),
-        indent: { left: 720 },
-        border: { left: { style: BorderStyle.THICK, size: 12, color: C.blueSoft, space: 8 } },
-        spacing: { before: 120, after: 120 },
+        children: inlineRuns(t.slice(2), C.blue),
+        indent:   { left: 720 },
+        border:   { left: { style: BorderStyle.THICK, size: 12, color: C.blueSoft, space: 8 } },
+        spacing:  { before: 120, after: 120 },
       })); continue
     }
 
@@ -393,21 +442,21 @@ function mdToDocx(md) {
     if (t.match(/^[-*] /)) {
       elems.push(new Paragraph({
         children: inlineRuns(t.slice(2)),
-        bullet: { level: 0 },
-        spacing: { before: 60, after: 60 },
+        bullet:   { level: 0 },
+        spacing:  { before: 60, after: 60 },
       })); continue
     }
 
     // Listas ordenadas
     if (t.match(/^\d+\. /)) {
       elems.push(new Paragraph({
-        children: inlineRuns(t.replace(/^\d+\. /, '')),
+        children:  inlineRuns(t.replace(/^\d+\. /, '')),
         numbering: { reference: 'ordered', level: 0 },
-        spacing: { before: 60, after: 60 },
+        spacing:   { before: 60, after: 60 },
       })); continue
     }
 
-    // Separador
+    // Separador horizontal
     if (t === '---' || t === '***') {
       elems.push(hr(C.blueTint, 4)); continue
     }
@@ -415,7 +464,7 @@ function mdToDocx(md) {
     // Párrafo normal
     elems.push(new Paragraph({
       children: inlineRuns(t),
-      spacing: { before: 60, after: 100 },
+      spacing:  { before: 60, after: 100 },
     }))
   }
 
@@ -439,8 +488,8 @@ export async function generarDocx({ tipo, titulo, contenido, meta = {} }) {
   const portada = buildPortada({
     titulo,
     proyectoNombre: meta.proyectoNombre ?? 'Proyecto',
-    etapaNombre:    meta.etapaNombre ?? '',
-    usuarioNombre:  meta.usuarioNombre ?? '',
+    etapaNombre:    meta.etapaNombre    ?? '',
+    usuarioNombre:  meta.usuarioNombre  ?? '',
     fecha,
   })
 
@@ -450,11 +499,9 @@ export async function generarDocx({ tipo, titulo, contenido, meta = {} }) {
     creator:     'Germina · Laboratorio de Gobierno',
     title:       titulo,
     description: `${tipo} — ${meta.proyectoNombre}`,
-    // Incrustar Publico Banner en el docx para que Word la muestre
-    // en cualquier equipo sin necesidad de tenerla instalada
     ...(publicoBannerTtf ? {
       fonts: [{
-        name: 'Publico Banner',
+        name: F.display,
         data: publicoBannerTtf,
         characterSet: CharacterSet.ANSI,
       }],
@@ -465,11 +512,11 @@ export async function generarDocx({ tipo, titulo, contenido, meta = {} }) {
         levels: [{
           level: 0,
           format: LevelFormat.DECIMAL,
-          text: '%1.',
+          text:   '%1.',
           alignment: AlignmentType.LEFT,
           style: {
             paragraph: { indent: { left: 720, hanging: 360 } },
-            run: { size: S.body, color: C.textBody, font: 'Libre Franklin' },
+            run:       { size: S.body, color: C.textBody, font: F.body },
           },
         }],
       }],

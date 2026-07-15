@@ -5,8 +5,8 @@ import {
   Globe, Handshake, BarChart3, Construction, GraduationCap, Sprout,
   Settings, Cpu, Zap, Building2, TreePine, BookOpen, Telescope,
   MessageSquare, Clock, ChevronRight, CheckSquare, Square, ListTodo,
-  TrendingUp, TrendingDown, Route, RefreshCw, FileText, X,
-  Mic, MicOff, Download, FileDown,
+  TrendingUp, TrendingDown, Route, RefreshCw, FileText, X, Plus,
+  Mic, MicOff, Download, FileDown, Trash2, GitBranch,
 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -48,13 +48,14 @@ function getRutaStyle(proyecto) {
 
 // ─── Etiqueta visual de tool call ─────────────────────────────────────────
 const TOOL_LABELS = {
-  agregar_tarea:              { icon: ListTodo,   label: 'Tarea agregada', color: '#10B981' },
-  completar_tarea:            { icon: CheckSquare, label: 'Tarea completada', color: '#6366F1' },
-  actualizar_resumen_proceso: { icon: RefreshCw,  label: 'Resumen actualizado', color: '#F59E0B' },
-  registrar_ruta:             { icon: Route,      label: 'Ruta registrada', color: '#8B5CF6' },
-  avanzar_etapa:              { icon: TrendingUp, label: 'Etapa avanzada', color: '#10B981' },
-  retroceder_etapa:           { icon: TrendingDown, label: 'Etapa retrocedida', color: '#EF4444' },
-  generar_documento:          { icon: FileDown,   label: 'Documento generado', color: '#3B82F6' },
+  agregar_tarea:              { icon: ListTodo,   label: 'Tarea agregada',        color: '#10B981' },
+  completar_tarea:            { icon: CheckSquare, label: 'Tarea completada',      color: '#6366F1' },
+  actualizar_resumen_proceso: { icon: RefreshCw,  label: 'Resumen actualizado',   color: '#F59E0B' },
+  registrar_ruta:             { icon: GitBranch,  label: 'Ruta registrada',        color: '#8B5CF6' },
+  bifurcacion:                { icon: GitBranch,  label: 'Bifurcación de ruta',    color: '#8B5CF6' },
+  avanzar_etapa:              { icon: TrendingUp, label: 'Etapa avanzada',         color: '#10B981' },
+  retroceder_etapa:           { icon: TrendingDown, label: 'Etapa retrocedida',   color: '#EF4444' },
+  generar_documento:          { icon: FileDown,   label: 'Documento generado',     color: '#3B82F6' },
 }
 
 function ToolCallChip({ toolCall }) {
@@ -149,20 +150,15 @@ function EntradaItem({ entrada, isActive, onClick }) {
   )
 }
 
-// ─── Item de tarea ─────────────────────────────────────────────────────────
-function TareaItem({ tarea, onToggle }) {
+// ─── Item de tarea (solo visual, el agente la completa) ────────────────────────────────────────
+function TareaItem({ tarea }) {
   const completada = tarea.estado === 'completada'
   return (
-    <button
-      onClick={() => !completada && onToggle(tarea.id)}
-      style={{
-        all: 'unset', display: 'flex', alignItems: 'flex-start', gap: '0.5rem',
-        cursor: completada ? 'default' : 'pointer',
-        padding: '0.4rem 0', width: '100%', boxSizing: 'border-box',
-        opacity: completada ? 0.5 : 1,
-      }}
-      title={completada ? 'Completada' : 'Marcar como completada'}
-    >
+    <div style={{
+      display: 'flex', alignItems: 'flex-start', gap: '0.5rem',
+      padding: '0.4rem 0', width: '100%', boxSizing: 'border-box',
+      opacity: completada ? 0.5 : 1,
+    }}>
       {completada
         ? <CheckSquare size={14} style={{ color: '#10B981', flexShrink: 0, marginTop: 2 }} />
         : <Square size={14} style={{ color: 'var(--text-muted)', flexShrink: 0, marginTop: 2 }} />
@@ -173,33 +169,57 @@ function TareaItem({ tarea, onToggle }) {
       }}>
         {tarea.descripcion}
       </span>
-    </button>
+    </div>
   )
 }
 
-// ─── Item de documento ─────────────────────────────────────────────────────
-function DocumentoItem({ doc }) {
+// ─── Item de documento ───────────────────────────────────────────────────
+function DocumentoItem({ doc, onDelete }) {
+  const [confirmando, setConfirmando] = useState(false)
   const fecha = new Date(doc.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })
   return (
-    <a
-      href={doc.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{
-        display: 'flex', alignItems: 'center', gap: '0.5rem',
-        padding: '0.4rem 0.5rem', borderRadius: 'var(--radius-sm)',
-        textDecoration: 'none', color: 'var(--text-secondary)',
-        fontSize: '0.72rem', transition: 'background 0.1s',
-        ':hover': { background: 'var(--bg-main)' },
-      }}
-      onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-main)'}
-      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-    >
-      <FileText size={13} style={{ color: '#3B82F6', flexShrink: 0 }} />
-      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{doc.nombre}</span>
-      <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)', flexShrink: 0 }}>{fecha}</span>
-      <Download size={11} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
-    </a>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+      <a
+        href={doc.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          flex: 1, display: 'flex', alignItems: 'center', gap: '0.5rem',
+          padding: '0.4rem 0.5rem', borderRadius: 'var(--radius-sm)',
+          textDecoration: 'none', color: 'var(--text-secondary)',
+          fontSize: '0.72rem', minWidth: 0,
+        }}
+        onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-main)'}
+        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+      >
+        <FileText size={13} style={{ color: '#3B82F6', flexShrink: 0 }} />
+        <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{doc.nombre}</span>
+        <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)', flexShrink: 0 }}>{fecha}</span>
+        <Download size={11} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+      </a>
+      {confirmando ? (
+        <>
+          <button
+            onClick={() => { setConfirmando(false); onDelete(doc.id) }}
+            style={{ all: 'unset', cursor: 'pointer', fontSize: '0.6rem', color: 'var(--c-red)', fontWeight: 700, whiteSpace: 'nowrap' }}
+          >Borrar</button>
+          <button
+            onClick={() => setConfirmando(false)}
+            style={{ all: 'unset', cursor: 'pointer', fontSize: '0.6rem', color: 'var(--text-muted)' }}
+          >No</button>
+        </>
+      ) : (
+        <button
+          onClick={() => setConfirmando(true)}
+          style={{ all: 'unset', cursor: 'pointer', padding: '0.2rem', borderRadius: '4px', color: 'var(--text-muted)', display: 'flex' }}
+          title="Eliminar documento"
+          onMouseEnter={e => { e.currentTarget.style.color = 'var(--c-red)'; e.currentTarget.style.background = '#FEF2F2' }}
+          onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'transparent' }}
+        >
+          <Trash2 size={12} />
+        </button>
+      )}
+    </div>
   )
 }
 
@@ -219,6 +239,7 @@ export default function ProjectView() {
   const [error, setError]                 = useState('')
   const [lastToolCalls, setLastToolCalls] = useState([])
   const [showCompletadas, setShowCompletadas] = useState(false)
+  const [sessionVigente, setSessionVigente]   = useState(null) // id de entrada activa o null
 
   // ── Grabacion de voz ──
   const [recording, setRecording]         = useState(false)
@@ -232,15 +253,17 @@ export default function ProjectView() {
   // ── Cargar proyecto y bitácora ──
   const loadData = useCallback(async () => {
     try {
-      const [{ proyecto: p }, bitacoraData, docsData] = await Promise.all([
+      const [{ proyecto: p }, bitacoraData, docsData, vigenteData] = await Promise.all([
         apiFetch(`/proyectos/${id}`),
         apiFetch(`/chat/${id}/bitacora`),
         apiFetch(`/documentos/${id}`).catch(() => ({ documentos: [] })),
+        apiFetch(`/chat/${id}/vigente`).catch(() => ({ vigente: null })),
       ])
       setProyecto(p)
       setEntradas(bitacoraData.entradas)
       setTareas(bitacoraData.tareas ?? [])
       setDocumentos(docsData.documentos ?? [])
+      setSessionVigente(vigenteData.vigente)
       if (bitacoraData.entradas.length > 0)
         setEntradaActiva(bitacoraData.entradas[bitacoraData.entradas.length - 1])
     } catch (err) {
@@ -256,12 +279,7 @@ export default function ProjectView() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [entradaActiva?.mensajes])
 
-  // Limpiar chips de tool calls tras 6 segundos
-  useEffect(() => {
-    if (lastToolCalls.length === 0) return
-    const t = setTimeout(() => setLastToolCalls([]), 6000)
-    return () => clearTimeout(t)
-  }, [lastToolCalls])
+  // Los chips de tool-calls ahora son persistentes (rol='evento'), no necesitan timer
 
   // ── Enviar mensaje ──
   const handleSend = async () => {
@@ -306,6 +324,7 @@ export default function ProjectView() {
       setEntradas(bitacoraData.entradas)
       const entradaActualizada = bitacoraData.entradas.find(en => en.id === result.entrada_id) ?? bitacoraData.entradas[bitacoraData.entradas.length - 1]
       setEntradaActiva(entradaActualizada)
+      setSessionVigente(result.entrada_id)
     } catch (err) {
       setError(err.message)
       setEntradaActiva(prev => prev
@@ -322,14 +341,21 @@ export default function ProjectView() {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
   }
 
-  // ── Completar tarea (desde sidebar) ──
-  const handleCompletarTarea = async (tareaId) => {
+  // ── Borrar documento ──
+  const handleDeleteDocumento = async (docId) => {
     try {
-      await apiFetch(`/chat/${id}/tareas/${tareaId}/completar`, { method: 'POST' })
-      setTareas(prev => prev.map(t => t.id === tareaId ? { ...t, estado: 'completada', completada_en: new Date().toISOString() } : t))
+      await apiFetch(`/documentos/${docId}`, { method: 'DELETE' })
+      setDocumentos(prev => prev.filter(d => d.id !== docId))
     } catch (err) {
-      console.error('Error al completar tarea:', err.message)
+      console.error('Error al borrar documento:', err.message)
     }
+  }
+
+  // ── Nueva sesión ──
+  const handleNuevaSesion = async () => {
+    setInput('Hola, volvamos a donde estabamos.')
+    // Hacer foco en el textarea para que el usuario confirme o edite
+    setTimeout(() => textareaRef.current?.focus(), 100)
   }
 
   // ── Grabacion de voz ──
@@ -409,6 +435,7 @@ export default function ProjectView() {
   const initials = (user?.user_metadata?.nombre ?? user?.email ?? 'U').slice(0, 2).toUpperCase()
   const nombreUser = user?.user_metadata?.nombre ?? user?.email?.split('@')[0] ?? 'Usuario'
   const mensajesActivos = entradaActiva?.mensajes ?? []
+  const sesionCaducada = entradaActiva && entradaActiva.id !== sessionVigente && !sending
 
   const tareasPendientes  = tareas.filter(t => t.estado === 'pendiente')
   const tareasCompletadas = tareas.filter(t => t.estado === 'completada')
@@ -460,7 +487,7 @@ export default function ProjectView() {
           <p style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', margin: '0 0 0.5rem' }}>
             Bitacora
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', flex: 1, overflowY: 'auto' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
             {entradas.map(e => (
               <EntradaItem
                 key={e.id}
@@ -474,46 +501,68 @@ export default function ProjectView() {
                 Todavia no hay entradas
               </p>
             )}
+            {/* Botón Nueva Sesión: visible cuando no hay sesión vigente */}
+            {!sessionVigente && (
+              <button
+                onClick={handleNuevaSesion}
+                style={{
+                  all: 'unset', cursor: 'pointer', marginTop: '0.5rem',
+                  display: 'flex', alignItems: 'center', gap: '0.4rem',
+                  fontSize: 'var(--fs-xs)', color: 'var(--c-blue-dark)',
+                  fontWeight: 600, padding: '0.4rem 0.5rem',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1.5px dashed var(--c-blue-soft)',
+                  background: 'var(--c-blue-tint)',
+                  width: '100%', boxSizing: 'border-box',
+                }}
+              >
+                <Plus size={13} /> Nueva sesión
+              </button>
+            )}
           </div>
 
-          {/* Tareas */}
-          {tareas.length > 0 && (
-            <div style={{ borderTop: '1px solid var(--border-color)', marginTop: '0.75rem', paddingTop: '0.75rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-                <p style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', margin: 0 }}>
-                  Tareas ({tareasPendientes.length} pendientes)
+          {/* Tareas + Documentos */}
+          <div>
+            {tareas.length > 0 && (
+              <div style={{ borderTop: '1px solid var(--border-color)', marginTop: '0.75rem', paddingTop: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                  <p style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', margin: 0 }}>
+                    Tareas ({tareasPendientes.length} pendientes)
+                  </p>
+                  {tareasCompletadas.length > 0 && (
+                    <button
+                      onClick={() => setShowCompletadas(v => !v)}
+                      style={{ all: 'unset', cursor: 'pointer', fontSize: '0.6rem', color: 'var(--text-muted)' }}
+                    >
+                      {showCompletadas ? 'Ocultar' : 'Ver todas'}
+                    </button>
+                  )}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  {tareasPendientes.map(t => (
+                    <TareaItem key={t.id} tarea={t} />
+                  ))}
+                  {showCompletadas && tareasCompletadas.map(t => (
+                    <TareaItem key={t.id} tarea={t} />
+                  ))}
+                </div>
+                <p style={{ fontSize: '0.62rem', color: 'var(--text-muted)', margin: '0.4rem 0 0', fontStyle: 'italic' }}>
+                  El asistente marca las tareas al ver el resultado.
                 </p>
-                {tareasCompletadas.length > 0 && (
-                  <button
-                    onClick={() => setShowCompletadas(v => !v)}
-                    style={{ all: 'unset', cursor: 'pointer', fontSize: '0.6rem', color: 'var(--text-muted)' }}
-                  >
-                    {showCompletadas ? 'Ocultar' : 'Ver todas'}
-                  </button>
-                )}
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                {tareasPendientes.map(t => (
-                  <TareaItem key={t.id} tarea={t} onToggle={handleCompletarTarea} />
-                ))}
-                {showCompletadas && tareasCompletadas.map(t => (
-                  <TareaItem key={t.id} tarea={t} onToggle={() => {}} />
-                ))}
-              </div>
-            </div>
-          )}
+            )}
 
-          {/* Documentos */}
-          {documentos.length > 0 && (
-            <div style={{ borderTop: '1px solid var(--border-color)', marginTop: '0.75rem', paddingTop: '0.75rem' }}>
-              <p style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', margin: '0 0 0.4rem' }}>
-                Documentos ({documentos.length})
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
-                {documentos.map(d => <DocumentoItem key={d.id} doc={d} />)}
+            {documentos.length > 0 && (
+              <div style={{ borderTop: '1px solid var(--border-color)', marginTop: '0.75rem', paddingTop: '0.75rem' }}>
+                <p style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', margin: '0 0 0.4rem' }}>
+                  Documentos ({documentos.length})
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+                  {documentos.map(d => <DocumentoItem key={d.id} doc={d} onDelete={handleDeleteDocumento} />)}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </aside>
 
         {/* ── Area de chat ── */}
@@ -543,11 +592,21 @@ export default function ProjectView() {
                 </p>
               </div>
             )}
-            {mensajesActivos.map(m => (
-              <MessageBubble key={m.id} mensaje={m} />
-            ))}
+            {mensajesActivos.map(m => {
+              if (m.rol === 'evento') {
+                try {
+                  const ev = JSON.parse(m.contenido)
+                  return (
+                    <div key={m.id} style={{ display: 'flex', justifyContent: 'center', margin: '0.25rem 0' }}>
+                      <ToolCallChip toolCall={ev} />
+                    </div>
+                  )
+                } catch { return null }
+              }
+              return <MessageBubble key={m.id} mensaje={m} />
+            })}
 
-            {/* Chips de tool calls de la ultima respuesta */}
+            {/* Chips de tool calls transitorios (mientras se procesa) */}
             {lastToolCalls.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem', margin: '0.5rem 0' }}>
                 {lastToolCalls.map((tc, i) => (
@@ -578,7 +637,25 @@ export default function ProjectView() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input */}
+          {/* Input — oculto si la sesión está caducada */}
+          {sesionCaducada ? (
+            <div style={{
+              padding: '1rem 1.5rem', borderTop: '1px solid var(--border-color)',
+              background: 'var(--bg-main)', display: 'flex', flexDirection: 'column',
+              alignItems: 'center', gap: '0.5rem',
+            }}>
+              <p style={{ margin: 0, fontSize: 'var(--fs-xs)', color: 'var(--text-muted)', textAlign: 'center' }}>
+                Esta sesión caducó. Para continuar, inicia una nueva.
+              </p>
+              <button
+                className="btn-primary"
+                onClick={handleNuevaSesion}
+                style={{ fontSize: 'var(--fs-xs)', padding: '0.4rem 1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+              >
+                <Plus size={14} /> Nueva sesión
+              </button>
+            </div>
+          ) : (
           <div className="chat-input-area">
             <button
               className="chat-send-btn"
@@ -612,6 +689,7 @@ export default function ProjectView() {
               {sending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
             </button>
           </div>
+          )}
         </main>
       </div>
     </div>

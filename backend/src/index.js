@@ -9,6 +9,7 @@ import demoRoutes from './routes/demo.js'
 import vozRoutes from './routes/voz.js'
 import { requireAuth } from './middleware/auth.js'
 import { query } from './db/index.js'
+import { createClient } from '@supabase/supabase-js'
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -57,6 +58,42 @@ app.get('/api/documentos/:proyectoId', requireAuth, async (req, res) => {
     res.json({ documentos: docs })
   } catch (err) {
     console.error('GET documentos error:', err.message)
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// ── Borrar documento ─────────────────────────────────────
+app.delete('/api/documentos/:docId', requireAuth, async (req, res) => {
+  const { docId } = req.params
+  try {
+    // Verificar que el documento pertenece al usuario
+    const { rows: [doc] } = await query(
+      `SELECT d.id, d.url, d.proyecto_id FROM documentos d
+       JOIN proyectos p ON p.id = d.proyecto_id
+       WHERE d.id = $1 AND p.owner_id = $2`,
+      [docId, req.user.id]
+    )
+    if (!doc) return res.status(404).json({ error: 'Documento no encontrado' })
+
+    // Eliminar de la DB
+    await query(`DELETE FROM documentos WHERE id = $1`, [docId])
+
+    // Intentar borrar del Storage (no es bloqueante si falla)
+    try {
+      const supabaseAdmin = createClient(
+        process.env.SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY,
+        { auth: { persistSession: false } }
+      )
+      // Extraer el path del bucket desde la URL publica
+      const urlObj = new URL(doc.url)
+      const storagePath = urlObj.pathname.replace('/storage/v1/object/public/germina-docs/', '')
+      await supabaseAdmin.storage.from('germina-docs').remove([storagePath])
+    } catch (_) { /* ignorar errores de storage */ }
+
+    res.json({ ok: true })
+  } catch (err) {
+    console.error('DELETE documento error:', err.message)
     res.status(500).json({ error: err.message })
   }
 })
